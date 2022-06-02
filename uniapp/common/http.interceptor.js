@@ -1,36 +1,5 @@
 //免登录接口
 let noLoginUrl = [	
-	'/addons/booking/common/init',
-	'/addons/booking/ems/send',
-	'/addons/booking/sms/send',
-	'/addons/booking/login/login',
-	'/addons/booking/login/mobilelogin',
-	'/addons/booking/login/register',
-	'/addons/booking/login/resetpwd',
-	'/addons/booking/login/wxLogin',
-	'/addons/booking/login/appLogin',
-	'/addons/booking/login/getWechatMobile',
-	'/addons/third/api/getAuthUrl',
-	'/addons/third/api/callback',
-	'/addons/third/api/account',
-	
-	'/addons/booking/house/condition',
-	'/addons/booking/house/detail',
-	'/addons/booking/house/houseList',
-	'/addons/booking/house/booking',
-	'/addons/booking/house/monthHouse',
-	'/addons/booking/teasing/teasingTag',
-	'/addons/booking/store/storeList',
-	'/addons/booking/store/detail',
-	'/addons/booking/common/mapSearch',
-	
-	'/addons/booking/store/defaultStore',
-	'/addons/booking/store/cutStore',
-	'/addons/booking/coupon/couponList',
-		
-	// #ifdef APP-PLUS
-	'/addons/booking/common/staticAmap',
-	// #endif
 ];
 
 //设置session_id
@@ -59,6 +28,7 @@ const install = (Vue, vm) => {
 	// 请求拦截，配置Token等参数
 	Vue.prototype.$u.http.interceptor.request = (config) => {		
 		//在需要登录的接口，请求前判断token 是否存在,不存在则到登录
+
 		// if (noLoginUrl.indexOf(config.url) == -1 && !vm.vuex_token) {
 		// 	vm.$u.route('/pages/login/mobilelogin');
 		// 	return false;
@@ -66,25 +36,15 @@ const install = (Vue, vm) => {
 		config.header.token = vm.vuex_token;
 		config.header.Authorization = 'Bearer ' + vm.vuex_token;
 		console.log('header token:',config.header.Authorization)
-		//设置session_id
-		config.header.sid = getSessionId(vm);
-		config.header.uid = vm.vuex_user.id || 0;
+
 		config.header['x-requested-with'] = 'xmlhttprequest';		
-		// if (config.method == 'POST') {
-		// 	config.data['__token__'] = vm.vuex__token__;
-		// }		
+	
 		return config;
 	}
 	// 响应拦截，判断状态码是否通过
 	Vue.prototype.$u.http.interceptor.response = (res) => {			
-		//返回__token__,设置	
-		// if (res.header.__token__) {
-		// 	vm.$u.vuex('vuex__token__', res.header.__token__);
-		// }		
+
 		let result = res.data;		
-		// if(result.data && result.data.__token__){
-		// 	vm.$u.vuex('vuex__token__', result.data.__token__);
-		// }
 		switch (result.code) {
 			case 1:
 			case 0:

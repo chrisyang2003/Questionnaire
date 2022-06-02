@@ -18,26 +18,12 @@
 			</view>
 			
 			<u-cell-group style="margin-top: 30rpx;">
-					<u-cell-item icon="home-fill" title="乡镇测评" @click="goPage('/pages/exam/xiang')"></u-cell-item>
-					<u-cell-item icon="home" title="县部门测评" @click="goPage('/pages/exam/xian')"></u-cell-item>
+					<u-cell-item icon="home-fill" title="乡镇测评" @click="goPage('/pages/exam/xiang', true)"></u-cell-item>
+					<u-cell-item icon="home" title="县部门测评" @click="goPage('/pages/exam/xian', true)"></u-cell-item>
 				</u-cell-group>
-			
-			
-			
-			
-			<!-- <view class="u-m-t-30 grid">
-				<u-grid :col="3">
-					<u-grid-item v-for="(item, index) in vuex_config.navigate" :key="index" @click="grids(item)">
-						<u-icon :name="item.image" :size="item.size"></u-icon>
-						<view class="u-m-t-20">{{ item.name }}</view>
-					</u-grid-item>
-				</u-grid>
-			</view>			 -->
+
 		</view>
-		
-		
-		<!-- <u-skeleton :loading="loading" :animation="true" bgColor="#FFF"></u-skeleton> -->
-		<!-- 底部导航 -->
+
 		<fa-tabbar></fa-tabbar>
 	</view>
 </template>
@@ -50,12 +36,7 @@ export default {
 		};
 	},
 	async onShow() {
-		if (!this.vuex_store.id) {
-			await this.getDefaultStore();
-			this.loading = false;
-		} else {
-			this.loading = false;
-		}
+
 	},
 	computed: {
 		notice() {

@@ -4,7 +4,6 @@
 		<fa-navbar title="县部门列表" :border-bottom="false"></fa-navbar>
 		<view class="u-p-20 bg-white u-flex u-col-center">
 			<view class="u-flex-1"><fa-search :mode="2" @search="search"></fa-search></view>
-			<view class="u-p-l-15 u-p-r-5 u-flex u-col-center"><fa-orderby-select @change="change"></fa-orderby-select></view>
 		</view>
 		<view class="hoter-list u-p-t-30 u-p-l-30 u-p-r-30">
 			<view class="item bg-white u-m-b-30" v-for="(item, index) in list" :key="index">
@@ -73,9 +72,6 @@ export default {
 		};
 	},
 	methods: {		
-		clickSwiper(index, item) {
-			this.goPage('/pages/hotel/detail?id=' + item.id);
-		},
 		getHouseList() {
 			this.$api.getxian().then(res => {
 				this.list = res

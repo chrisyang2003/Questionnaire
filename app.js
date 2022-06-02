@@ -79,6 +79,8 @@ app.use((req, res, next) => {
     next()
 })
 
+app.use(express.static('vue/dist'));
+
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 
@@ -96,7 +98,13 @@ app.use(exjwt({
     secret: key,  // 签名的密钥 或 PublicKey
     algorithms: ["HS256"]
 }).unless({
-    path: ['/user/login', '/admin/login', '/admin/info', '/admin/statis']  // 指定路径不经过 Token 解析
+    path: [
+        '/user/login',
+        '/admin/login',
+        '/admin/info',
+        '/admin/statis',
+        '/common/init'
+    ]  // 指定路径不经过 Token 解析
 }))
 
 
@@ -119,7 +127,6 @@ app.post('/admin/login', function (req, res) {
 });
 
 app.get('/admin/info', function (req, res) {
-
     res.json({
         code: 200,
         msg: "登陆失败",
@@ -129,6 +136,12 @@ app.get('/admin/info', function (req, res) {
             avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
             name: 'Super Admin'
         }
+    })
+});
+
+app.get('/admin/logout', function (req, res) {
+    res.json({
+        code: 200,
     })
 });
 
@@ -191,6 +204,91 @@ app.get('/admin/statis', async (req, res) => {
         }
     })
 });
+
+app.get('/common/init', async (req, res) => {
+    let init = {
+        code: 1,
+        msg: "",
+        data: {
+            swiper: [
+                {
+                    image: "http://chrisyy.top:5000/assets/addons/booking/img/swiper1.jpg",
+                    title: "旅游度假好去处",
+                    path: "/pages/my/my"
+                },
+                {
+                    image: "http://chrisyy.top:5000/assets/addons/booking/img/swiper2.jpg",
+                    title: "欢迎您的到来！",
+                    path: "/pages/my/my"
+                }
+            ],
+            notice: [
+                {
+                    title: "欢迎来到珙县",
+                    path: "/pages/my/my"
+                }
+            ],
+
+            tpl_ids: [],
+            navbar: {
+                titleColor: "#fff",
+                bgColor: {
+                    background: "#374486"
+                },
+                backIconColor: "#fff",
+                backTextStyle: {
+                    color: "#fff"
+                },
+                titleSize: "35",
+                isshow: true
+            },
+            theme: {
+                color: "#ffffff",
+                bgColor: "#374486",
+                ladder: 10,
+                number: 9,
+                border: 5
+            },
+            tabbar: {
+                color: "#999",
+                selectColor: "#000",
+                bgColor: "#ffffff",
+                height: "100",
+                borderTop: true,
+                iconSize: "40",
+                midButton: false,
+                midButtonSize: "60",
+                list: [
+                    {
+                        image: "http://chrisyy.top:5000/assets/addons/booking/img/tabbar/home.png",
+                        selectedImage: "http://chrisyy.top:5000/assets/addons/booking/img/tabbar/home-hl.png",
+                        text: "首页",
+                        path: "/pages/index/index",
+                        midButton: false,
+                        count: 0,
+                        isDot: false,
+                        badgeColor: "#ffffff",
+                        badgeBgColor: "#374486"
+                    },
+                    {
+                        image: "http://chrisyy.top:5000/assets/addons/booking/img/tabbar/my.png",
+                        selectedImage: "http://chrisyy.top:5000/assets/addons/booking/img/tabbar/my-hl.png",
+                        text: "我的",
+                        path: "/pages/my/my",
+                        midButton: false,
+                        count: 0,
+                        isDot: false,
+                        badgeColor: "#ffffff",
+                        badgeBgColor: "#374486"
+                    }
+                ],
+                isshow: true
+            }
+        }
+    }
+
+    res.json(init)
+})
 
 app.get('/user/index', (req, res) => {
     const user = req.auth.user
@@ -256,47 +354,60 @@ app.get('/submit', async (req, res) => {
     })
 });
 
-app.get('/loc/getxian', async (req, res) => {
-    const user = req.auth.user
-
-    let xiangAll = await XianIDTable.findAll()
-    let userlist = []
-    for (let i of xiangAll) {
-
-        let check = await xianQuestion.findAll({
-            where: {
-                locid: i.id,
-                person: user
+app.get('/loc/getxian', async (req, res, next) => {
+    try {
+        const user = req.auth.user
+        let xiangAll = await XianIDTable.findAll()
+        let userlist = []
+        for (let i of xiangAll) {
+            let check = await xianQuestion.findAll({
+                where: {
+                    locid: i.id,
+                    person: user
+                }
+            })
+            if (!check.length) {
+                userlist.push(i)
             }
-        })
-        if (!check.length) {
-            userlist.push(i)
         }
+        res.json(userlist)
+    } catch (error) {
+        next(err)
     }
 
-    res.json(userlist)
 });
 
 app.get('/loc/getxiang', async (req, res) => {
-    const user = req.auth.user
-
-    let xiangAll = await XiangIDTable.findAll()
-    let userlist = []
-    for (let i of xiangAll) {
-
-        let check = await xiangQuestion.findAll({
-            where: {
-                locid: i.id,
-                person: user
+    try {
+        const user = req.auth.user
+        let xiangAll = await XiangIDTable.findAll()
+        let userlist = []
+        for (let i of xiangAll) {
+            let check = await xiangQuestion.findAll({
+                where: {
+                    locid: i.id,
+                    person: user
+                }
+            })
+            if (!check.length) {
+                userlist.push(i)
             }
-        })
-        if (!check.length) {
-            userlist.push(i)
         }
+        res.json(userlist)
+    } catch (error) {
+        next(error)
     }
-
-    res.json(userlist)
 });
+
+app.post('/user/feedback', async (req, res) => {
+    const content = req.body
+    console.log(content)
+
+    res.json({
+        code: 200,
+        msg: "提交成功"
+    })
+})
 
 app.get('/admin/init', async (req, res) => {
     const xian = await XianIDTable.findAll()
@@ -316,6 +427,14 @@ app.get('/admin/init', async (req, res) => {
 
 
     res.json(xian)
+});
+
+app.use(function (err, req, res, next) {
+    console.log(err)
+    res.json({
+        code: 401,
+        msg: "未登录"
+    })
 });
 
 app.listen(3000, async function () {
